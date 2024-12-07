@@ -16,48 +16,39 @@
     <!-- Contenedor principal -->
     <div class="container">
         <!-- ############################################################################################################## -->
-        <!-- Formulario para agregar un nuevo tweet -->
+        <!-- Formulario para agregar un nuevo alumno -->
         <form action="/user" method="post" class="mb-4">
-            <!-- Campo para content -->
-            <div class="mb-3">
-                <label for="content" class="form-label">Contenido</label>
-                <input type="text" class="form-control border border-3 border-danger mx-auto" name="content" placeholder="Contenido del tweet" required> 
-            </div>
-            <!-- Campo para author -->
-            <div class="mb-3">
-                <label for="author" class="form-label">Autor</label>
-                <input type="text" class="form-control border border-3 border-danger mx-auto" name="author" placeholder="Autor del tweet" required> 
-            </div>
+            
             <div class="row">
-                <!-- Campo para likes -->
+                <!-- Campo para nombre -->
                 <div class="col-md-3">
                     <div class="mb-3 " >
-                        <label for="likes" class="form-label">Likes</label>
-                        <input type="number" class="form-control border border-3 border-danger mx-auto" min="0" value="0" name="likes" required> 
+                        <label for="nombre" class="form-label">Nombre del alumno</label>
+                        <input type="text" class="form-control border border-3 border-danger mx-auto" name="nombre" placeholder="Nombre del alumno" required> 
                     </div>
                 </div>
                 
-                <!-- Campo para retweets -->
+                <!-- Campo para apellido -->
                 <div class="col-md-3">
                     <div class="mb-3">
-                        <label for="retweets" class="form-label">Retweets</label>
-                        <input type="number" class="form-control border border-3 border-danger mx-auto" min="0" value="0" name="retweets" required> 
+                        <label for="apellido" class="form-label">Apellido del alumno</label>
+                        <input type="text" class="form-control border border-3 border-danger mx-auto" name="apellido" placeholder="Apellido del alumno" required> 
                     </div>
                 </div>
                 
-                <!-- Campo para replies -->
+                <!-- Campo para aprobado -->
                 <div class="col-md-3">
                     <div class="mb-3">
-                        <label for="replies" class="form-label">Replies</label>
-                        <input type="number" class="form-control border border-3 border-danger mx-auto" min="0" value="0" name="replies" required> 
+                        <label for="aprobado" class="form-label">Estado</label>
+                        <input type="number" class="form-control border border-3 border-danger mx-auto" name="aprobado" min="0" max="1" placeholder="Aprobado=1 /desaprobado=0" required> 
                     </div>
                 </div>
                 
-                <!-- Campo para hashtags -->
+                <!-- Campo para nota -->
                 <div class="col-md-3">
                     <div class="mb-3">
-                        <label for="hashtags" class="form-label">Hashtags</label>
-                        <input type="text" class="form-control border border-3 border-danger mx-auto" name="hashtags" placeholder="#hashtags" required> 
+                        <label for="nota" class="form-label">Nota</label>
+                        <input type="number" class="form-control border border-3 border-danger mx-auto" name="nota" min="0" max="20" placeholder="Nota del alumno" required> 
                     </div>
                 </div>
             </div>
@@ -68,19 +59,17 @@
         <!-- ############################################################################################################## -->
 
         <!-- ############################################################################################################## -->
-        <!-- Tabla para mostrar la lista de usuarios -->
+        <!-- Tabla para mostrar la lista de alumnos -->
         <table class="table table-bordered text-center">
             <thead class="table-primary">
                 <!-- Encabezados de las columnas de la tabla -->
                 <tr>
                     <th>id</th> 
-                    <th>Contenido</th> 
-                    <th>Autor</th> 
-                    <th>Likes</th> 
-                    <th>Reteewts</th> 
-                    <th>Replies</th> 
-                    <th>Hashtags</th>
-                    <th>Creación</th>
+                    <th>Nombre</th> 
+                    <th>Apellido</th> 
+                    <th>Estado</th> 
+                    <th>Nota</th> 
+                    <th>Fecha</th> 
                     <th>Editar</th> <!-- Columna para botones de edición -->
                     <th>Eliminar</th> <!-- Columna para botones de eliminación -->
                     <th>Ver detalles</th> <!-- Columna para enlaces a detalles -->
@@ -91,19 +80,17 @@
                 {% for user in data %}
                 <tr>
                     <td>{{ user.id }}</td> 
-                    <td>{{ user.content }}</td> 
-                    <td>{{ user.author }}</td> 
-                    <td>{{ user.likes }}</td> 
-                    <td>{{ user.retweets }}</td> 
-                    <td>{{ user.replies }}</td> 
-                    <td>{{ user.hashtags }}</td>
-                    <td>{{ user.created_at }}</td>
+                    <td>{{ user.nombre }}</td> 
+                    <td>{{ user.apellido }}</td> 
+                    <td>{{ "Aprobado" if user.aprobado == 1 else "Desaprobado" }}</td> 
+                    <td>{{ user.nota }}</td> 
+                    <td>{{ user.fecha }}</td> 
 
                     <!-- Botón para abrir el modal de edición -->
                     <td><a href="#" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editModal{{ user.id }}">Editar</a></td>
-                    <!-- Botón para eliminar el usuario -->
-                    <td><a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este tweet?');">Eliminar</a></td>
-                    <!-- Botón para ver los detalles del usuario -->
+                    <!-- Botón para eliminar el alumno -->
+                    <td><a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar este alumno?');">Eliminar</a></td>
+                    <!-- Botón para ver los detalles del alumno -->
                     <td><a href="{{ url_for('view_user', id=user.id) }}" class="btn btn-info btn-sm">Ver detalles</a></td>
                 </tr>
                 <!-- ############################################################################################################## -->
@@ -116,56 +103,44 @@
                             <!-- Formulario dentro del modal para editar al usuario -->
                             <form action="/edit/{{ user.id }}" method="post">
                                 <div class="modal-header">
-                                    <h5 class="modal-title" id="editModalLabel">Editar tweet: {{ user.id }} | Creado : {{ user.created_at }}</h5>
+                                    <h5 class="modal-title" id="editModalLabel">Editar alumno: {{ user.id }} | Fecha : {{ user.fecha }}</h5>
                                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <!-- Campo para editar el Username -->
-                                    <div class="mb-3">
-                                        <label for="content" class="form-label">Contenido</label>
-                                        <input type="text" class="form-control border border-3 border-danger mx-auto" name="content" value="{{ user.content }}" required>
-                                    </div>
-                                    <!-- Campo para editar el Nombre -->
-                                    <div class="mb-3">
-                                        <label for="author" class="form-label">Autor</label>
-                                        <input type="text" class="form-control border border-3 border-danger mx-auto" name="author" value="{{ user.author }}" required>
-                                    </div>
 
                                     <div class="row">
-                                        <!-- Campo para likes -->
-                                        <div class="col-md-4">
-                                            <div class="mb-4 text-center" >
-                                                <label for="likes" class="form-label">Likes</label>
-                                                <input type="number" class="form-control border border-3 border-danger mx-auto text-center" min="0" value="{{ user.likes }}" name="likes" required> 
+                                        <!-- Campo para nombre -->
+                                        <div class="col-md-6">
+                                            <div class="mb-4 " >
+                                                <label for="nombre" class="form-label">Nombre</label>
+                                                <input type="text" class="form-control border border-3 border-danger mx-auto" name="nombre" value="{{ user.nombre }}" required> 
                                             </div>
                                         </div>
                                         
-                                        <!-- Campo para retweets -->
-                                        <div class="col-md-4">
-                                            <div class="mb-4 text-center">
-                                                <label for="retweets" class="form-label">Retweets</label>
-                                                <input type="number" class="form-control border border-3 border-danger mx-auto text-center" min="0" value="{{ user.retweets }}" name="retweets" required> 
+                                        <!-- Campo para apellido -->
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="apellido" class="form-label">Apellido</label>
+                                                <input type="text" class="form-control border border-3 border-danger mx-auto" name="apellido" value="{{ user.apellido }}" required> 
                                             </div>
                                         </div>
                                         
-                                        <!-- Campo para replies -->
-                                        <div class="col-md-4">
-                                            <div class="mb-4 text-center">
-                                                <label for="replies" class="form-label">Replies</label>
-                                                <input type="number" class="form-control border border-3 border-danger mx-auto text-center" min="0" value="{{ user.replies }}" name="replies" required> 
+                                        <!-- Campo para aprobado -->
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="aprobado" class="form-label">Estado ( 1 / 0 )</label>
+                                                <input type="number" class="form-control border border-3 border-danger mx-auto" name="aprobado"min="0" max="1" value="{{ user.aprobado }}" required> 
                                             </div>
                                         </div>
                                         
+                                        <!-- Campo para nota -->
+                                        <div class="col-md-6">
+                                            <div class="mb-4">
+                                                <label for="nota" class="form-label">Nota</label>
+                                                <input type="number" class="form-control border border-3 border-danger mx-auto" min="0" max="20" name="nota" value="{{ user.nota }}" required> 
+                                            </div>
+                                        </div>
                                     </div>
-
-
-
-                                    <!-- Campo para editar la Contraseña -->
-                                    <div class="mb-3">
-                                        <label for="hashtags" class="form-label">Hashtags</label>
-                                        <input type="text" class="form-control border border-3 border-danger mx-auto" name="hashtags" value="{{ user.hashtags }}" required>
-                                    </div>
-                                </div>
                                 
                                 <div class="modal-footer">
                                     <!-- Botón para guardar los cambios -->

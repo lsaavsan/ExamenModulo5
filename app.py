@@ -5,27 +5,28 @@ from dotenv import load_dotenv
 
 # Cargar las variables de entorno desde un archivo .env (si se usa)
 # Esto permite mantener información sensible (como credenciales) fuera del código fuente.
+# Recomendado por el profesor
 load_dotenv()
 
 # Configuración de la conexión a la base de datos utilizando variables de entorno
 database = pymysql.connect(
-    host=os.getenv('DB_HOST'),  # Dirección del servidor de la base de datos (obtenida de las variables de entorno)
-    user=os.getenv('DB_USER'),  # Usuario autorizado para acceder a la base de datos
-    password=os.getenv('DB_PASSWORD'),  # Contraseña del usuario
-    database=os.getenv('DB_NAME'),  # Nombre de la base de datos
+    host=os.getenv('DB_HOST'),              # Dirección del servidor de la base de datos (obtenida de las variables de entorno)
+    user=os.getenv('DB_USER'),              # Usuario autorizado para acceder a la base de datos
+    password=os.getenv('DB_PASSWORD'),      # Contraseña del usuario
+    database=os.getenv('DB_NAME'),          # Nombre de la base de datos
     cursorclass=pymysql.cursors.DictCursor  # Configuración para obtener resultados como diccionarios
 )
 
 # Inicializamos la aplicación Flask
 app = Flask(__name__)
 
-# Ruta principal que muestra la lista de usuarios
+# Ruta principal que muestra la lista de alumnos
 @app.route("/")
 def home():
     # Crear un cursor para interactuar con la base de datos
     cursor = database.cursor()
     
-    # Ejecutar una consulta SQL para obtener todos los registros de la tabla 'clientes'
+    # Ejecutar una consulta SQL para obtener todos los registros de la tabla alumnos
     cursor.execute("SELECT * FROM alumnos")
     
     # Recuperar todos los resultados de la consulta como una lista de diccionarios
@@ -37,23 +38,24 @@ def home():
     # Renderizar la plantilla 'index.html' y pasar los datos de usuarios a la plantilla
     return render_template("index.html", data=users)
 
-# Ruta para agregar un nuevo usuario
+# Ruta para agregar un nuevo alumno
 @app.route("/user", methods=['POST'])
 def add_user():
     # Obtener los valores enviados desde el formulario HTML
-    content = request.form["content"]  
-    author = request.form["author"]      
-    hashtags = request.form["hashtags"]  
+    nombre = request.form["nombre"]  
+    apellido = request.form["apellido"]
+    aprobado = request.form["aprobado"]  
+    nota = request.form["nota"]  
     
     # Verificar que los campos requeridos no estén vacíos
-    if content and author and hashtags:
+    if nombre and apellido and aprobado and nota:
         # Crear un cursor para interactuar con la base de datos
         cursor = database.cursor()
         
-        # Ejecutar una consulta SQL para insertar un nuevo usuario
+        # Ejecutar una consulta SQL para insertar un nuevo alumno
         cursor.execute(
-            'INSERT INTO alumnos (content, author, hashtags) VALUES (%s, %s, %s)', 
-            (content, author, hashtags)
+            'INSERT INTO alumnos (nombre, apellido, aprobado, nota) VALUES (%s, %s, %s, %s)', 
+            (nombre, apellido, aprobado, nota)
         )
         
         # Confirmar los cambios en la base de datos
@@ -65,13 +67,13 @@ def add_user():
     # Redirigir al usuario de nuevo a la página principal
     return redirect(url_for('home'))
 
-# Ruta para eliminar un usuario
+# Ruta para eliminar un alumno
 @app.route("/delete/<int:id>")
 def delete_user(id):
     # Crear un cursor para interactuar con la base de datos
     cursor = database.cursor()
     
-    # Ejecutar una consulta SQL para eliminar un usuario por su ID
+    # Ejecutar una consulta SQL para eliminar un alumno por su ID
     cursor.execute("DELETE FROM alumnos WHERE id = %s", (id,))
     
     # Confirmar los cambios en la base de datos
@@ -80,7 +82,7 @@ def delete_user(id):
     # Cerrar el cursor para liberar recursos
     cursor.close()
     
-    # Redirigir al usuario de nuevo a la página principal
+    # Redirigir al alumno de nuevo a la página principal
     return redirect(url_for('home'))
 
 # Ruta para mostrar detalles de un usuario específico
@@ -89,7 +91,7 @@ def view_user(id):
     # Crear un cursor para interactuar con la base de datos
     cursor = database.cursor()
     
-    # Ejecutar una consulta SQL para obtener los datos de un usuario por su ID
+    # Ejecutar una consulta SQL para obtener los datos de un alumno por su ID
     cursor.execute("SELECT * FROM alumnos WHERE id = %s", (id,))
     
     # Recuperar el resultado de la consulta (un único registro)
@@ -100,32 +102,29 @@ def view_user(id):
     
     # Verificar si el usuario existe
     if user:
-        # Renderizar la plantilla 'user_detail.html' con los datos del usuario
+        # Renderizar la plantilla 'user_detail.html' con los datos del alumno
         return render_template("user_detail.html", user=user)
     else:
-        # Si no se encuentra el usuario, devolver un mensaje de error con el código HTTP 404
+        # Si no se encuentra el alumno, devolver un mensaje de error con el código HTTP 404
         return "Usuario no encontrado", 404
 
-# Ruta para editar los datos de un usuario
+# Ruta para editar los datos de un alumno
 @app.route("/edit/<int:id>", methods=['POST'])
 def edit_user(id):
     # Obtener los valores enviados desde el formulario HTML
-    content = request.form["content"]  
-    author = request.form["author"]      
-    hashtags = request.form["hashtags"]
-    likes = request.form["likes"]  
-    retweets = request.form["retweets"]      
-    replies = request.form["replies"]
-    
+    nombre = request.form["nombre"]  
+    apellido = request.form["apellido"]      
+    aprobado = request.form["aprobado"]  
+    nota = request.form["nota"]  
     # Verificar que los campos requeridos no estén vacíos
-    if content and author and hashtags:
+    if nombre and apellido and aprobado and nota:
         # Crear un cursor para interactuar con la base de datos
         cursor = database.cursor()
         
-        # Ejecutar una consulta SQL para actualizar los datos del usuario
+        # Ejecutar una consulta SQL para actualizar los datos del alumno
         cursor.execute(
-            'UPDATE tweets SET content = %s, author = %s, hashtags = %s, likes= %s , retweets= %s, replies= %s  WHERE id = %s', 
-            (content, author, hashtags, likes, retweets, replies, id)
+            'UPDATE alumnos SET nombre = %s, apellido = %s, aprobado = %s, nota= %s  WHERE id = %s', 
+            (nombre, apellido, aprobado, nota, id)
         )
         
         # Confirmar los cambios en la base de datos
