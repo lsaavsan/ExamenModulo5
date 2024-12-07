@@ -26,7 +26,7 @@ def home():
     cursor = database.cursor()
     
     # Ejecutar una consulta SQL para obtener todos los registros de la tabla 'clientes'
-    cursor.execute("SELECT * FROM tweets")
+    cursor.execute("SELECT * FROM alumnos")
     
     # Recuperar todos los resultados de la consulta como una lista de diccionarios
     users = cursor.fetchall()
@@ -52,7 +52,7 @@ def add_user():
         
         # Ejecutar una consulta SQL para insertar un nuevo usuario
         cursor.execute(
-            'INSERT INTO tweets (content, author, hashtags) VALUES (%s, %s, %s)', 
+            'INSERT INTO alumnos (content, author, hashtags) VALUES (%s, %s, %s)', 
             (content, author, hashtags)
         )
         
@@ -72,7 +72,7 @@ def delete_user(id):
     cursor = database.cursor()
     
     # Ejecutar una consulta SQL para eliminar un usuario por su ID
-    cursor.execute("DELETE FROM tweets WHERE id = %s", (id,))
+    cursor.execute("DELETE FROM alumnos WHERE id = %s", (id,))
     
     # Confirmar los cambios en la base de datos
     database.commit()
@@ -90,7 +90,7 @@ def view_user(id):
     cursor = database.cursor()
     
     # Ejecutar una consulta SQL para obtener los datos de un usuario por su ID
-    cursor.execute("SELECT * FROM tweets WHERE id = %s", (id,))
+    cursor.execute("SELECT * FROM alumnos WHERE id = %s", (id,))
     
     # Recuperar el resultado de la consulta (un único registro)
     user = cursor.fetchone()
